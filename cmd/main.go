@@ -5,10 +5,11 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+
+	"github.com/PickStranger/reverse-proxy-agent/internal/middleware"
 )
 
 func main() {
-	// 백엔드 서비스 주소 (나중에 env로 분리)
 	target, err := url.Parse("http://localhost:8080")
 	if err != nil {
 		log.Fatal(err)
@@ -16,8 +17,14 @@ func main() {
 
 	proxy := httputil.NewSingleHostReverseProxy(target)
 
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fp := middleware.ExtractFingerprint(r)
+		log.Printf("Fingerprint: %s | IP: %s | UA: %s", fp.Hash, fp.IP, fp.UserAgent)
+		proxy.ServeHTTP(w, r)
+	})
+
 	log.Println("리버스 프록시 시작 :9000")
-	if err := http.ListenAndServe(":9000", proxy); err != nil {
+	if err := http.ListenAndServe(":9000", nil); err != nil {
 		log.Fatal(err)
 	}
 }
