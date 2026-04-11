@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 
 	"github.com/PickStranger/reverse-proxy-agent/internal/middleware"
+	redisclient "github.com/PickStranger/reverse-proxy-agent/internal/redis"
 )
 
 func main() {
@@ -16,9 +18,23 @@ func main() {
 	}
 
 	proxy := httputil.NewSingleHostReverseProxy(target)
+	rc := redisclient.NewClient("localhost:6379")
+	ctx := context.Background()
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fp := middleware.ExtractFingerprint(r)
+
+		blocked, err := rc.IsBlacklisted(ctx, fp.Hash)
+		if err != nil {
+			log.Printf("Redis 오류: %v", err)
+		}
+
+		if blocked {
+			http.Error(w, "403 Forbidden", http.StatusForbidden)
+			log.Printf("차단됨: %s", fp.Hash)
+			return
+		}
+
 		log.Printf("Fingerprint: %s | IP: %s | UA: %s", fp.Hash, fp.IP, fp.UserAgent)
 		proxy.ServeHTTP(w, r)
 	})
