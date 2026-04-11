@@ -3,6 +3,7 @@ package middleware
 import (
 	"crypto/sha256"
 	"fmt"
+	"net"
 	"net/http"
 )
 
@@ -14,7 +15,7 @@ type Fingerprint struct {
 }
 
 func ExtractFingerprint(r *http.Request) Fingerprint {
-	ip := r.RemoteAddr
+	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
 	ua := r.Header.Get("User-Agent")
 	lang := r.Header.Get("Accept-Language")
 
