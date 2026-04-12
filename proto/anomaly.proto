@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package anomaly;
+
+option go_package = "github.com/PickStranger/reverse-proxy-agent/internal/grpc";
+
+service AnomalyDetector {
+  rpc Analyze(FingerprintRequest) returns (RiskResponse);
+}
+
+message FingerprintRequest {
+  string session_id = 1;
+  string fingerprint_hash = 2;
+  string ip = 3;
+  string user_agent = 4;
+}
+
+message RiskResponse {
+  float risk_score = 1;
+  bool block = 2;
+}
