@@ -2,59 +2,38 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"os"
-	"strconv"
-	"strings"
-	"time"
 
+	"github.com/PickStranger/reverse-proxy-agent/internal/config"
+	aigrpc "github.com/PickStranger/reverse-proxy-agent/internal/grpc"
 	"github.com/PickStranger/reverse-proxy-agent/internal/middleware"
 	redisclient "github.com/PickStranger/reverse-proxy-agent/internal/redis"
-	"github.com/joho/godotenv"
 )
 
-func getEnv(key, defaultVal string) string {
-	if val := os.Getenv(key); val != "" {
-		return val
-	}
-	return defaultVal
-}
-
 func main() {
-	godotenv.Load()
+	cfg := config.Load()
+	aiClient := aigrpc.NewMockAIClient(cfg.BlockThreshold)
 
-	targetURL := getEnv("TARGET_URL", "https://localhost:8080")
-	redisAddr := getEnv("REDIS_ADDR", "localhost:6379")
-	port := getEnv("PORT", "9000")
-	blockThreshold, _ := strconv.ParseFloat(getEnv("BLOCK_THRESHOLD", "0.8"), 64)
-	blacklistTTL, _ := strconv.Atoi(getEnv("BLACKLIST_TIL", "3600"))
-	whitelistIPs := strings.Split(getEnv("WHITELIST_IPS", ""), ",")
-	aiTimeout, _ := strconv.Atoi(getEnv("AI_TIMEOUT", "5"))
+	log.Printf("설정: 임계값=%.1f, TTL=%d초, AI타임아웃=%v", cfg.BlockThreshold, cfg.BlacklistTTL, cfg.AITimeout)
+	log.Printf("화이트리스트: %v", cfg.WhitelistIPs)
 
-	log.Printf("설정: 임계값=%.1f, TTL=%d초, AI타임아웃=%d초", blockThreshold, blacklistTTL, aiTimeout)
-	log.Printf("화이트리스트: %v", whitelistIPs)
-
-	target, err := url.Parse(targetURL)
+	target, err := url.Parse(cfg.TargetURL)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	proxy := httputil.NewSingleHostReverseProxy(target)
-	rc := redisclient.NewClient(redisAddr)
+	rc := redisclient.NewClient(cfg.RedisAddr)
 	ctx := context.Background()
-
-	whitelist := make(map[string]bool)
-	for _, ip := range whitelistIPs {
-		whitelist[strings.TrimSpace(ip)] = true
-	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fp := middleware.ExtractFingerprint(r)
 
-		if whitelist[fp.IP] {
+		if cfg.WhitelistIPs[fp.IP] {
 			log.Printf("화이트리스트 통과: %s", fp.IP)
 			proxy.ServeHTTP(w, r)
 			return
@@ -64,21 +43,30 @@ func main() {
 		if err != nil {
 			log.Printf("Redis 오류: %v", err)
 		}
-
 		if blocked {
 			http.Error(w, "403 Forbidden", http.StatusForbidden)
-			log.Printf("차단됨: %s", fp.Hash)
+			log.Printf("차단됨(Redis): %s", fp.Hash)
 			return
 		}
 
-		_ = time.Duration(aiTimeout) * time.Second
+		resp, err := aiClient.Analyze(ctx, fp.Hash, fp.IP, fp.UserAgent)
+		if err != nil {
+			log.Printf("AI 오류: %v", err)
+		} else if resp.Block {
+			http.Error(w, "403 Forbidden", http.StatusForbidden)
+			log.Printf("차단됨(AI): score=%.2f hash=%s", resp.RiskScore, fp.Hash)
+			return
+		}
 
-		log.Printf("Fingerprint: %s | IP: %s | UA: %s", fp.Hash, fp.IP, fp.UserAgent)
+		r.Header.Set("X-Device-Id", fp.Hash)
+		r.Header.Set("X-Risk-Score", fmt.Sprintf("%.2f", resp.RiskScore))
+
+		log.Printf("통과: %s | score=%.2f", fp.IP, resp.RiskScore)
 		proxy.ServeHTTP(w, r)
 	})
 
-	log.Printf("리버스 프록시 시작 :%s", port)
-	if err := http.ListenAndServe(":9000", nil); err != nil {
+	log.Printf("리버스 프록시 시작 :%s", cfg.Port)
+	if err := http.ListenAndServe(":"+cfg.Port, nil); err != nil {
 		log.Fatal(err)
 	}
 }

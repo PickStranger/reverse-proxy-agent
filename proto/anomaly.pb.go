@@ -4,7 +4,7 @@
 // 	protoc        v7.34.1
 // source: proto/anomaly.proto
 
-package grpc
+package ai
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -21,30 +21,34 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type FingerprintRequest struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	SessionId       string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	FingerprintHash string                 `protobuf:"bytes,2,opt,name=fingerprint_hash,json=fingerprintHash,proto3" json:"fingerprint_hash,omitempty"`
-	Ip              string                 `protobuf:"bytes,3,opt,name=ip,proto3" json:"ip,omitempty"`
-	UserAgent       string                 `protobuf:"bytes,4,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+type RevEnvironment struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	BackendServiceUrl  string                 `protobuf:"bytes,1,opt,name=backend_service_url,json=backendServiceUrl,proto3" json:"backend_service_url,omitempty"`
+	ProxyPort          int32                  `protobuf:"varint,2,opt,name=proxy_port,json=proxyPort,proto3" json:"proxy_port,omitempty"`
+	AiModuleGrpcUrl    string                 `protobuf:"bytes,3,opt,name=ai_module_grpc_url,json=aiModuleGrpcUrl,proto3" json:"ai_module_grpc_url,omitempty"`
+	RiskScoreThreshold float32                `protobuf:"fixed32,4,opt,name=risk_score_threshold,json=riskScoreThreshold,proto3" json:"risk_score_threshold,omitempty"`
+	AiResponseTimeout  int32                  `protobuf:"varint,5,opt,name=ai_response_timeout,json=aiResponseTimeout,proto3" json:"ai_response_timeout,omitempty"`
+	BlacklistDuration  int32                  `protobuf:"varint,6,opt,name=blacklist_duration,json=blacklistDuration,proto3" json:"blacklist_duration,omitempty"`
+	WhitelistIps       []string               `protobuf:"bytes,7,rep,name=whitelist_ips,json=whitelistIps,proto3" json:"whitelist_ips,omitempty"`
+	Version            string                 `protobuf:"bytes,8,opt,name=version,proto3" json:"version,omitempty"` // 혹시나 모를 버전 관리용
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
-func (x *FingerprintRequest) Reset() {
-	*x = FingerprintRequest{}
+func (x *RevEnvironment) Reset() {
+	*x = RevEnvironment{}
 	mi := &file_proto_anomaly_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *FingerprintRequest) String() string {
+func (x *RevEnvironment) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*FingerprintRequest) ProtoMessage() {}
+func (*RevEnvironment) ProtoMessage() {}
 
-func (x *FingerprintRequest) ProtoReflect() protoreflect.Message {
+func (x *RevEnvironment) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_anomaly_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -56,109 +60,187 @@ func (x *FingerprintRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FingerprintRequest.ProtoReflect.Descriptor instead.
-func (*FingerprintRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use RevEnvironment.ProtoReflect.Descriptor instead.
+func (*RevEnvironment) Descriptor() ([]byte, []int) {
 	return file_proto_anomaly_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *FingerprintRequest) GetSessionId() string {
+func (x *RevEnvironment) GetBackendServiceUrl() string {
 	if x != nil {
-		return x.SessionId
+		return x.BackendServiceUrl
 	}
 	return ""
 }
 
-func (x *FingerprintRequest) GetFingerprintHash() string {
+func (x *RevEnvironment) GetProxyPort() int32 {
 	if x != nil {
-		return x.FingerprintHash
-	}
-	return ""
-}
-
-func (x *FingerprintRequest) GetIp() string {
-	if x != nil {
-		return x.Ip
-	}
-	return ""
-}
-
-func (x *FingerprintRequest) GetUserAgent() string {
-	if x != nil {
-		return x.UserAgent
-	}
-	return ""
-}
-
-type RiskResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RiskScore     float32                `protobuf:"fixed32,1,opt,name=risk_score,json=riskScore,proto3" json:"risk_score,omitempty"`
-	Block         bool                   `protobuf:"varint,2,opt,name=block,proto3" json:"block,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RiskResponse) Reset() {
-	*x = RiskResponse{}
-	mi := &file_proto_anomaly_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RiskResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RiskResponse) ProtoMessage() {}
-
-func (x *RiskResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_anomaly_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RiskResponse.ProtoReflect.Descriptor instead.
-func (*RiskResponse) Descriptor() ([]byte, []int) {
-	return file_proto_anomaly_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *RiskResponse) GetRiskScore() float32 {
-	if x != nil {
-		return x.RiskScore
+		return x.ProxyPort
 	}
 	return 0
 }
 
-func (x *RiskResponse) GetBlock() bool {
+func (x *RevEnvironment) GetAiModuleGrpcUrl() string {
 	if x != nil {
-		return x.Block
+		return x.AiModuleGrpcUrl
+	}
+	return ""
+}
+
+func (x *RevEnvironment) GetRiskScoreThreshold() float32 {
+	if x != nil {
+		return x.RiskScoreThreshold
+	}
+	return 0
+}
+
+func (x *RevEnvironment) GetAiResponseTimeout() int32 {
+	if x != nil {
+		return x.AiResponseTimeout
+	}
+	return 0
+}
+
+func (x *RevEnvironment) GetBlacklistDuration() int32 {
+	if x != nil {
+		return x.BlacklistDuration
+	}
+	return 0
+}
+
+func (x *RevEnvironment) GetWhitelistIps() []string {
+	if x != nil {
+		return x.WhitelistIps
+	}
+	return nil
+}
+
+func (x *RevEnvironment) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+type EnvironmentRequester struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ServiceName   string                 `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"` //요청하는 사람 명
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EnvironmentRequester) Reset() {
+	*x = EnvironmentRequester{}
+	mi := &file_proto_anomaly_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EnvironmentRequester) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnvironmentRequester) ProtoMessage() {}
+
+func (x *EnvironmentRequester) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_anomaly_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnvironmentRequester.ProtoReflect.Descriptor instead.
+func (*EnvironmentRequester) Descriptor() ([]byte, []int) {
+	return file_proto_anomaly_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *EnvironmentRequester) GetServiceName() string {
+	if x != nil {
+		return x.ServiceName
+	}
+	return ""
+}
+
+type EnvironmentUpdateResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"` //성공했는지
+	Msg           string                 `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`          //응답에 대한 메세지
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EnvironmentUpdateResponse) Reset() {
+	*x = EnvironmentUpdateResponse{}
+	mi := &file_proto_anomaly_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EnvironmentUpdateResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnvironmentUpdateResponse) ProtoMessage() {}
+
+func (x *EnvironmentUpdateResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_anomaly_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnvironmentUpdateResponse.ProtoReflect.Descriptor instead.
+func (*EnvironmentUpdateResponse) Descriptor() ([]byte, []int) {
+	return file_proto_anomaly_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *EnvironmentUpdateResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
 	}
 	return false
+}
+
+func (x *EnvironmentUpdateResponse) GetMsg() string {
+	if x != nil {
+		return x.Msg
+	}
+	return ""
 }
 
 var File_proto_anomaly_proto protoreflect.FileDescriptor
 
 const file_proto_anomaly_proto_rawDesc = "" +
 	"\n" +
-	"\x13proto/anomaly.proto\x12\aanomaly\"\x8d\x01\n" +
-	"\x12FingerprintRequest\x12\x1d\n" +
+	"\x13proto/anomaly.proto\x12\x05ai.v1\"\xdc\x02\n" +
+	"\x0eRevEnvironment\x12.\n" +
+	"\x13backend_service_url\x18\x01 \x01(\tR\x11backendServiceUrl\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12)\n" +
-	"\x10fingerprint_hash\x18\x02 \x01(\tR\x0ffingerprintHash\x12\x0e\n" +
-	"\x02ip\x18\x03 \x01(\tR\x02ip\x12\x1d\n" +
-	"\n" +
-	"user_agent\x18\x04 \x01(\tR\tuserAgent\"C\n" +
-	"\fRiskResponse\x12\x1d\n" +
-	"\n" +
-	"risk_score\x18\x01 \x01(\x02R\triskScore\x12\x14\n" +
-	"\x05block\x18\x02 \x01(\bR\x05block2P\n" +
-	"\x0fAnomalyDetector\x12=\n" +
-	"\aAnalyze\x12\x1b.anomaly.FingerprintRequest\x1a\x15.anomaly.RiskResponseB;Z9github.com/PickStranger/reverse-proxy-agent/internal/grpcb\x06proto3"
+	"proxy_port\x18\x02 \x01(\x05R\tproxyPort\x12+\n" +
+	"\x12ai_module_grpc_url\x18\x03 \x01(\tR\x0faiModuleGrpcUrl\x120\n" +
+	"\x14risk_score_threshold\x18\x04 \x01(\x02R\x12riskScoreThreshold\x12.\n" +
+	"\x13ai_response_timeout\x18\x05 \x01(\x05R\x11aiResponseTimeout\x12-\n" +
+	"\x12blacklist_duration\x18\x06 \x01(\x05R\x11blacklistDuration\x12#\n" +
+	"\rwhitelist_ips\x18\a \x03(\tR\fwhitelistIps\x12\x18\n" +
+	"\aversion\x18\b \x01(\tR\aversion\"9\n" +
+	"\x14EnvironmentRequester\x12!\n" +
+	"\fservice_name\x18\x01 \x01(\tR\vserviceName\"G\n" +
+	"\x19EnvironmentUpdateResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x10\n" +
+	"\x03msg\x18\x02 \x01(\tR\x03msg2\xb1\x01\n" +
+	"\x1bRevEnvironmentConfigService\x12D\n" +
+	"\x0eGetEnvironment\x12\x1b.ai.v1.EnvironmentRequester\x1a\x15.ai.v1.RevEnvironment\x12L\n" +
+	"\x11UpdateEnvironment\x12\x15.ai.v1.RevEnvironment\x1a .ai.v1.EnvironmentUpdateResponseB*\n" +
+	"\x18com.example.pickstrangerP\x01Z\f./pkg/gen/aib\x06proto3"
 
 var (
 	file_proto_anomaly_proto_rawDescOnce sync.Once
@@ -172,16 +254,19 @@ func file_proto_anomaly_proto_rawDescGZIP() []byte {
 	return file_proto_anomaly_proto_rawDescData
 }
 
-var file_proto_anomaly_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_proto_anomaly_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_proto_anomaly_proto_goTypes = []any{
-	(*FingerprintRequest)(nil), // 0: anomaly.FingerprintRequest
-	(*RiskResponse)(nil),       // 1: anomaly.RiskResponse
+	(*RevEnvironment)(nil),            // 0: ai.v1.RevEnvironment
+	(*EnvironmentRequester)(nil),      // 1: ai.v1.EnvironmentRequester
+	(*EnvironmentUpdateResponse)(nil), // 2: ai.v1.EnvironmentUpdateResponse
 }
 var file_proto_anomaly_proto_depIdxs = []int32{
-	0, // 0: anomaly.AnomalyDetector.Analyze:input_type -> anomaly.FingerprintRequest
-	1, // 1: anomaly.AnomalyDetector.Analyze:output_type -> anomaly.RiskResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	1, // 0: ai.v1.RevEnvironmentConfigService.GetEnvironment:input_type -> ai.v1.EnvironmentRequester
+	0, // 1: ai.v1.RevEnvironmentConfigService.UpdateEnvironment:input_type -> ai.v1.RevEnvironment
+	0, // 2: ai.v1.RevEnvironmentConfigService.GetEnvironment:output_type -> ai.v1.RevEnvironment
+	2, // 3: ai.v1.RevEnvironmentConfigService.UpdateEnvironment:output_type -> ai.v1.EnvironmentUpdateResponse
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -198,7 +283,7 @@ func file_proto_anomaly_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_anomaly_proto_rawDesc), len(file_proto_anomaly_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
