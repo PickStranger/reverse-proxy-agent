@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package ai.v1;
+option go_package = "./pkg/gen/ai";
+option java_package = "com.example.pickstranger";
+
+option java_multiple_files = true;
+
+service RevEnvironmentConfigService {
+  rpc GetEnvironment (EnvironmentRequester) returns(RevEnvironment);//환경변수를 가져옴
+  rpc UpdateEnvironment (RevEnvironment) returns (EnvironmentUpdateResponse);//환경 변수를 업데이트 함
+}
+
+message RevEnvironment {
+  string backend_service_url = 1;
+  int32 proxy_port = 2;
+  string ai_module_grpc_url = 3;
+
+  float risk_score_threshold = 4;
+  int32 ai_response_timeout = 5;
+  int32 blacklist_duration = 6;
+  repeated string whitelist_ips = 7;
+  string version = 8; // 혹시나 모를 버전 관리용
+}
+
+message EnvironmentRequester {
+  string service_name=1;//요청하는 사람 명
+}
+
+message EnvironmentUpdateResponse {//응답용 메세지
+  bool success = 1;//성공했는지
+  string msg = 2;//응답에 대한 메세지
+}

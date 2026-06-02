@@ -52,3 +52,5 @@ coverage.html
 
 # proto 자동생성 파일
 proto/generated/
+
+echo ".env" >> .gitignore
