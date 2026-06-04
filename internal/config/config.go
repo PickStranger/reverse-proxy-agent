@@ -14,7 +14,7 @@ type Config struct {
 	RedisAddr      string
 	Port           string
 	BlockThreshold float64
-	BlacklistTTL   int
+	BlacklistTTL   time.Duration // int → time.Duration으로 변경
 	WhitelistIPs   map[string]bool
 	AITimeout      time.Duration
 }
@@ -37,7 +37,7 @@ func Load() *Config {
 		RedisAddr:      getEnv("REDIS_ADDR", "localhost:6379"),
 		Port:           getEnv("PORT", "9000"),
 		BlockThreshold: blockThreshold,
-		BlacklistTTL:   blacklistTTL,
+		BlacklistTTL:   time.Duration(blacklistTTL) * time.Second, // 변환
 		WhitelistIPs:   whitelist,
 		AITimeout:      time.Duration(aiTimeout) * time.Second,
 	}

@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.1
-// source: proto/anomaly.proto
+// source: proto/environment.proto
 
-package ai
+package env
 
 import (
 	context "context"
@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	RevEnvironmentConfigService_GetEnvironment_FullMethodName    = "/ai.v1.RevEnvironmentConfigService/GetEnvironment"
-	RevEnvironmentConfigService_UpdateEnvironment_FullMethodName = "/ai.v1.RevEnvironmentConfigService/UpdateEnvironment"
+	RevEnvironmentConfigService_GetEnvironment_FullMethodName    = "/env.v1.RevEnvironmentConfigService/GetEnvironment"
+	RevEnvironmentConfigService_UpdateEnvironment_FullMethodName = "/env.v1.RevEnvironmentConfigService/UpdateEnvironment"
 )
 
 // RevEnvironmentConfigServiceClient is the client API for RevEnvironmentConfigService service.
@@ -143,7 +143,7 @@ func _RevEnvironmentConfigService_UpdateEnvironment_Handler(srv interface{}, ctx
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var RevEnvironmentConfigService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ai.v1.RevEnvironmentConfigService",
+	ServiceName: "env.v1.RevEnvironmentConfigService",
 	HandlerType: (*RevEnvironmentConfigServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -156,5 +156,5 @@ var RevEnvironmentConfigService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/anomaly.proto",
+	Metadata: "proto/environment.proto",
 }
