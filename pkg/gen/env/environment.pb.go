@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.1
-// source: proto/anomaly.proto
+// source: proto/environment.proto
 
-package ai
+package env
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -37,7 +37,7 @@ type RevEnvironment struct {
 
 func (x *RevEnvironment) Reset() {
 	*x = RevEnvironment{}
-	mi := &file_proto_anomaly_proto_msgTypes[0]
+	mi := &file_proto_environment_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -49,7 +49,7 @@ func (x *RevEnvironment) String() string {
 func (*RevEnvironment) ProtoMessage() {}
 
 func (x *RevEnvironment) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_anomaly_proto_msgTypes[0]
+	mi := &file_proto_environment_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -62,7 +62,7 @@ func (x *RevEnvironment) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevEnvironment.ProtoReflect.Descriptor instead.
 func (*RevEnvironment) Descriptor() ([]byte, []int) {
-	return file_proto_anomaly_proto_rawDescGZIP(), []int{0}
+	return file_proto_environment_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *RevEnvironment) GetBackendServiceUrl() string {
@@ -130,7 +130,7 @@ type EnvironmentRequester struct {
 
 func (x *EnvironmentRequester) Reset() {
 	*x = EnvironmentRequester{}
-	mi := &file_proto_anomaly_proto_msgTypes[1]
+	mi := &file_proto_environment_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -142,7 +142,7 @@ func (x *EnvironmentRequester) String() string {
 func (*EnvironmentRequester) ProtoMessage() {}
 
 func (x *EnvironmentRequester) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_anomaly_proto_msgTypes[1]
+	mi := &file_proto_environment_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -155,7 +155,7 @@ func (x *EnvironmentRequester) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EnvironmentRequester.ProtoReflect.Descriptor instead.
 func (*EnvironmentRequester) Descriptor() ([]byte, []int) {
-	return file_proto_anomaly_proto_rawDescGZIP(), []int{1}
+	return file_proto_environment_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *EnvironmentRequester) GetServiceName() string {
@@ -175,7 +175,7 @@ type EnvironmentUpdateResponse struct {
 
 func (x *EnvironmentUpdateResponse) Reset() {
 	*x = EnvironmentUpdateResponse{}
-	mi := &file_proto_anomaly_proto_msgTypes[2]
+	mi := &file_proto_environment_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -187,7 +187,7 @@ func (x *EnvironmentUpdateResponse) String() string {
 func (*EnvironmentUpdateResponse) ProtoMessage() {}
 
 func (x *EnvironmentUpdateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_anomaly_proto_msgTypes[2]
+	mi := &file_proto_environment_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -200,7 +200,7 @@ func (x *EnvironmentUpdateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EnvironmentUpdateResponse.ProtoReflect.Descriptor instead.
 func (*EnvironmentUpdateResponse) Descriptor() ([]byte, []int) {
-	return file_proto_anomaly_proto_rawDescGZIP(), []int{2}
+	return file_proto_environment_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *EnvironmentUpdateResponse) GetSuccess() bool {
@@ -217,11 +217,11 @@ func (x *EnvironmentUpdateResponse) GetMsg() string {
 	return ""
 }
 
-var File_proto_anomaly_proto protoreflect.FileDescriptor
+var File_proto_environment_proto protoreflect.FileDescriptor
 
-const file_proto_anomaly_proto_rawDesc = "" +
+const file_proto_environment_proto_rawDesc = "" +
 	"\n" +
-	"\x13proto/anomaly.proto\x12\x05ai.v1\"\xdc\x02\n" +
+	"\x17proto/environment.proto\x12\x06env.v1\"\xdc\x02\n" +
 	"\x0eRevEnvironment\x12.\n" +
 	"\x13backend_service_url\x18\x01 \x01(\tR\x11backendServiceUrl\x12\x1d\n" +
 	"\n" +
@@ -236,35 +236,35 @@ const file_proto_anomaly_proto_rawDesc = "" +
 	"\fservice_name\x18\x01 \x01(\tR\vserviceName\"G\n" +
 	"\x19EnvironmentUpdateResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x10\n" +
-	"\x03msg\x18\x02 \x01(\tR\x03msg2\xb1\x01\n" +
-	"\x1bRevEnvironmentConfigService\x12D\n" +
-	"\x0eGetEnvironment\x12\x1b.ai.v1.EnvironmentRequester\x1a\x15.ai.v1.RevEnvironment\x12L\n" +
-	"\x11UpdateEnvironment\x12\x15.ai.v1.RevEnvironment\x1a .ai.v1.EnvironmentUpdateResponseB*\n" +
-	"\x18com.example.pickstrangerP\x01Z\f./pkg/gen/aib\x06proto3"
+	"\x03msg\x18\x02 \x01(\tR\x03msg2\xb5\x01\n" +
+	"\x1bRevEnvironmentConfigService\x12F\n" +
+	"\x0eGetEnvironment\x12\x1c.env.v1.EnvironmentRequester\x1a\x16.env.v1.RevEnvironment\x12N\n" +
+	"\x11UpdateEnvironment\x12\x16.env.v1.RevEnvironment\x1a!.env.v1.EnvironmentUpdateResponseB/\n" +
+	"\x1ccom.example.pickstranger.envP\x01Z\r./pkg/gen/envb\x06proto3"
 
 var (
-	file_proto_anomaly_proto_rawDescOnce sync.Once
-	file_proto_anomaly_proto_rawDescData []byte
+	file_proto_environment_proto_rawDescOnce sync.Once
+	file_proto_environment_proto_rawDescData []byte
 )
 
-func file_proto_anomaly_proto_rawDescGZIP() []byte {
-	file_proto_anomaly_proto_rawDescOnce.Do(func() {
-		file_proto_anomaly_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_anomaly_proto_rawDesc), len(file_proto_anomaly_proto_rawDesc)))
+func file_proto_environment_proto_rawDescGZIP() []byte {
+	file_proto_environment_proto_rawDescOnce.Do(func() {
+		file_proto_environment_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_environment_proto_rawDesc), len(file_proto_environment_proto_rawDesc)))
 	})
-	return file_proto_anomaly_proto_rawDescData
+	return file_proto_environment_proto_rawDescData
 }
 
-var file_proto_anomaly_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_proto_anomaly_proto_goTypes = []any{
-	(*RevEnvironment)(nil),            // 0: ai.v1.RevEnvironment
-	(*EnvironmentRequester)(nil),      // 1: ai.v1.EnvironmentRequester
-	(*EnvironmentUpdateResponse)(nil), // 2: ai.v1.EnvironmentUpdateResponse
+var file_proto_environment_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_proto_environment_proto_goTypes = []any{
+	(*RevEnvironment)(nil),            // 0: env.v1.RevEnvironment
+	(*EnvironmentRequester)(nil),      // 1: env.v1.EnvironmentRequester
+	(*EnvironmentUpdateResponse)(nil), // 2: env.v1.EnvironmentUpdateResponse
 }
-var file_proto_anomaly_proto_depIdxs = []int32{
-	1, // 0: ai.v1.RevEnvironmentConfigService.GetEnvironment:input_type -> ai.v1.EnvironmentRequester
-	0, // 1: ai.v1.RevEnvironmentConfigService.UpdateEnvironment:input_type -> ai.v1.RevEnvironment
-	0, // 2: ai.v1.RevEnvironmentConfigService.GetEnvironment:output_type -> ai.v1.RevEnvironment
-	2, // 3: ai.v1.RevEnvironmentConfigService.UpdateEnvironment:output_type -> ai.v1.EnvironmentUpdateResponse
+var file_proto_environment_proto_depIdxs = []int32{
+	1, // 0: env.v1.RevEnvironmentConfigService.GetEnvironment:input_type -> env.v1.EnvironmentRequester
+	0, // 1: env.v1.RevEnvironmentConfigService.UpdateEnvironment:input_type -> env.v1.RevEnvironment
+	0, // 2: env.v1.RevEnvironmentConfigService.GetEnvironment:output_type -> env.v1.RevEnvironment
+	2, // 3: env.v1.RevEnvironmentConfigService.UpdateEnvironment:output_type -> env.v1.EnvironmentUpdateResponse
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -272,26 +272,26 @@ var file_proto_anomaly_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_proto_anomaly_proto_init() }
-func file_proto_anomaly_proto_init() {
-	if File_proto_anomaly_proto != nil {
+func init() { file_proto_environment_proto_init() }
+func file_proto_environment_proto_init() {
+	if File_proto_environment_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_anomaly_proto_rawDesc), len(file_proto_anomaly_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_environment_proto_rawDesc), len(file_proto_environment_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_proto_anomaly_proto_goTypes,
-		DependencyIndexes: file_proto_anomaly_proto_depIdxs,
-		MessageInfos:      file_proto_anomaly_proto_msgTypes,
+		GoTypes:           file_proto_environment_proto_goTypes,
+		DependencyIndexes: file_proto_environment_proto_depIdxs,
+		MessageInfos:      file_proto_environment_proto_msgTypes,
 	}.Build()
-	File_proto_anomaly_proto = out.File
-	file_proto_anomaly_proto_goTypes = nil
-	file_proto_anomaly_proto_depIdxs = nil
+	File_proto_environment_proto = out.File
+	file_proto_environment_proto_goTypes = nil
+	file_proto_environment_proto_depIdxs = nil
 }

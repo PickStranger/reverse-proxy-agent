@@ -1,56 +1,32 @@
-# If you prefer the allow list template instead of the deny list, see community template:
-# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
-#
-# Binaries for programs and plugins
+# ─── Go 바이너리 ───────────────────────────────
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
+/reverse-proxy-agent
 
-# Test binary, built with `go test -c`
+# ─── 테스트 ────────────────────────────────────
 *.test
-
-# Code coverage profiles and other test artifacts
 *.out
 coverage.*
 *.coverprofile
+coverage.html
 profile.cov
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
-
-# Go workspace file
+# ─── 빌드 캐시 ─────────────────────────────────
+/vendor/
 go.work
 go.work.sum
 
-# env file
-.env
-
-# Editor/IDE
-# .idea/
-# .vscode/
-
-# 바이너리
-/reverse-proxy-agent
-*.exe
-
-# Go 빌드 캐시
-/vendor/
-
-# 환경변수
+# ─── 환경변수 ───────────────────────────────────
 .env
 .env.*
 
-# IDE
+# ─── IDE ───────────────────────────────────────
 .idea/
 .vscode/
 
-# 테스트 커버리지
-*.out
-coverage.html
-
-# proto 자동생성 파일
-proto/generated/
-
-echo ".env" >> .gitignore
+# ─── proto 자동생성 파일 ────────────────────────
+# pb.go는 팀원 편의를 위해 커밋에 포함 (주석 처리)
+# pkg/gen/
