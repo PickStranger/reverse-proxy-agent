@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -17,18 +18,43 @@ import (
 
 func main() {
 	cfg := config.Load()
-	aiClient := aigrpc.NewMockAIClient(cfg.BlockThreshold)
 	rc := redisclient.NewClient(cfg.RedisAddr)
 	ctx := context.Background()
 
+	// ─── AI 클라이언트 선택: Mock vs 실제 gRPC ─────────────
+	aiClient := newAIClient(cfg)
+	if closer, ok := aiClient.(interface{ Close() error }); ok {
+		defer closer.Close()
+	}
+
 	log.Printf("설정: 임계값=%.1f, TTL=%v, AI타임아웃=%v", cfg.BlockThreshold, cfg.BlacklistTTL, cfg.AITimeout)
 	log.Printf("화이트리스트: %v", cfg.WhitelistIPs)
+	log.Printf("타깃(서비스앱): %s | AI모드: mock=%v grpc=%s", cfg.TargetURL, cfg.UseMockAI, cfg.AIGrpcAddr)
 
 	target, err := url.Parse(cfg.TargetURL)
 	if err != nil {
 		log.Fatal(err)
 	}
 	proxy := httputil.NewSingleHostReverseProxy(target)
+
+	// ─── 서비스앱 HTTPS 대응 ────────────────────────────────
+	// self-signed 인증서면 TLS 검증 skip (env: TARGET_INSECURE_SKIP_VERIFY)
+	if cfg.TargetInsecureSkipVerify {
+		proxy.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		log.Printf("주의: 타깃 TLS 인증서 검증 비활성화됨 (self-signed 용)")
+	}
+
+	// HTTPS vhost/SNI 정합을 위해 기본적으로 Host 헤더를 타깃으로 재작성.
+	// 원본 Host를 유지하려면 PRESERVE_HOST_HEADER=true.
+	if !cfg.PreserveHostHeader {
+		baseDirector := proxy.Director
+		proxy.Director = func(r *http.Request) {
+			baseDirector(r)
+			r.Host = target.Host
+		}
+	}
 
 	// ─── 1단계: 모든 요청 처리 ───────────────────────────────
 	// fingerprint 수집 → Redis 저장 → session_token 헤더 추가 → 포워딩
@@ -128,6 +154,20 @@ func main() {
 	if err := http.ListenAndServe(":"+cfg.Port, nil); err != nil {
 		log.Fatal(err)
 	}
+}
+
+// newAIClient는 설정에 따라 Mock 또는 실제 gRPC AI 클라이언트를 만든다.
+func newAIClient(cfg *config.Config) aigrpc.AIClient {
+	if cfg.UseMockAI {
+		log.Printf("AI 모드: Mock (USE_MOCK_AI=true)")
+		return aigrpc.NewMockAIClient(cfg.BlockThreshold)
+	}
+
+	client, err := aigrpc.NewGRPCAIClient(cfg.AIGrpcAddr, cfg.AIGrpcTLS, cfg.AITimeout)
+	if err != nil {
+		log.Fatalf("AI gRPC 연결 실패: %v", err)
+	}
+	return client
 }
 
 // riskscore 기반 액션 결정
