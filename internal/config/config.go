@@ -42,7 +42,14 @@ func Load() *Config {
 
 	blockThreshold, _ := strconv.ParseFloat(getEnv("BLOCK_THRESHOLD", "0.8"), 64)
 	blacklistTTL, _ := strconv.Atoi(getEnv("BLACKLIST_TTL", "3600"))
-	aiTimeout, _ := strconv.Atoi(getEnv("AI_TIMEOUT", "5"))
+
+	// AI_TIMEOUT은 "5s", "500ms" 같은 Go duration 문자열을 받는다.
+	// 기존 strconv.Atoi는 순수 숫자만 파싱 가능해 "5s" 입력 시 에러가 무시되고
+	// 항상 0으로 떨어지는 버그가 있었음 → time.ParseDuration으로 교체.
+	aiTimeout, err := time.ParseDuration(getEnv("AI_TIMEOUT", "5s"))
+	if err != nil {
+		aiTimeout = 5 * time.Second
+	}
 
 	return &Config{
 		TargetURL:      getEnv("TARGET_URL", "http://localhost:8080"),
@@ -51,7 +58,7 @@ func Load() *Config {
 		BlockThreshold: blockThreshold,
 		BlacklistTTL:   time.Duration(blacklistTTL) * time.Second, // 변환
 		WhitelistIPs:   whitelist,
-		AITimeout:      time.Duration(aiTimeout) * time.Second,
+		AITimeout:      aiTimeout,
 
 		UseMockAI:  getEnvBool("USE_MOCK_AI", false),
 		AIGrpcAddr: getEnv("AI_GRPC_ADDR", "localhost:50051"),
