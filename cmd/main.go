@@ -125,6 +125,11 @@ func main() {
 
 		_ = rc.DeleteFingerprint(ctx, req.SessionToken)
 
+		// risk_score가 정상 범위(0.0~1.0)를 벗어나면 로그로 남겨 AI 팀과 공유할 근거를 확보
+		if resp.RiskScore < 0 || resp.RiskScore > 1 {
+			log.Printf("경고: risk_score 비정상 범위 감지 score=%.2f user=%s (0.0~1.0 예상)", resp.RiskScore, req.UserID)
+		}
+
 		if resp.IsAnomaly {
 			_ = rc.AddBlacklist(ctx, fp.Hash, cfg.BlacklistTTL)
 			log.Printf("차단됨(AI): score=%.2f user=%s", resp.RiskScore, req.UserID)
@@ -134,7 +139,7 @@ func main() {
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"risk_score": resp.RiskScore,
 			"is_anomaly": resp.IsAnomaly,
-			"action":     actionFromScore(resp.RiskScore),
+			"action":     actionFromResult(resp.IsAnomaly, resp.RiskScore),
 		})
 	})
 
@@ -164,11 +169,16 @@ func newAIClient(cfg *config.Config) aigrpc.AIClient {
 	return client
 }
 
-// riskscore 기반 액션 결정
-func actionFromScore(score float32) string {
-	if score >= 0.7 {
+// / actionFromResult는 is_anomaly를 1차 판단 기준으로 삼는다.
+// AI 서버의 risk_score가 아직 0.0~1.0 스케일을 보장하지 않는 상태라
+// (예: 37.75 같은 비정상 값 관측됨) score 단독으로는 액션을 결정하지 않는다.
+// TODO: AI 팀과 risk_score 스케일 정합성 확인 후 score 기반 세분화 로직 복원
+func actionFromResult(isAnomaly bool, score float32) string {
+	if isAnomaly {
 		return "BLOCK"
-	} else if score >= 0.4 {
+	}
+	// score가 정상 범위(0.0~1.0)일 때만 보조적으로 CHALLENGE 판단
+	if score >= 0 && score <= 1 && score >= 0.4 {
 		return "CHALLENGE"
 	}
 	return "ALLOW"
