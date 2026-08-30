@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -118,8 +119,13 @@ func main() {
 			StoreEvent:     true,
 		})
 		if err != nil {
-			log.Printf("AI 오류: %v", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			if errors.Is(err, context.DeadlineExceeded) {
+				log.Printf("AI 타임아웃: user=%s", req.UserID)
+				http.Error(w, "AI Server Timeout", http.StatusGatewayTimeout) // 504
+			} else {
+				log.Printf("AI 오류: %v", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError) // 500
+			}
 			return
 		}
 
@@ -149,8 +155,16 @@ func main() {
 	// ─── 메트릭 미들웨어 적용 후 서버 시작 ───────────────────
 	handler := middleware.MetricsMiddleware(mux)
 
+	srv := &http.Server{
+		Addr:         ":" + cfg.Port,
+		Handler:      handler,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+
 	log.Printf("리버스 프록시 시작 :%s", cfg.Port)
-	if err := http.ListenAndServe(":"+cfg.Port, handler); err != nil {
+	if err := srv.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
 }
