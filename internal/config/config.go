@@ -10,13 +10,15 @@ import (
 )
 
 type Config struct {
-	TargetURL      string
-	RedisAddr      string
-	Port           string
-	BlockThreshold float64
-	BlacklistTTL   time.Duration // int → time.Duration으로 변경
-	WhitelistIPs   map[string]bool
-	AITimeout      time.Duration
+	TargetURL               string
+	RedisAddr               string
+	Port                    string
+	BlockThreshold          float64
+	BlacklistTTL            time.Duration // int → time.Duration으로 변경
+	WhitelistIPs            map[string]bool
+	AITimeout               time.Duration
+	CircuitBreakerThreshold int           // 연속 실패 N회 시 회로 open
+	CircuitBreakerCooldown  time.Duration // open 상태 유지 시간
 
 	// ─── AI gRPC 연동 ───────────────────────────────
 	UseMockAI  bool   // true면 Mock, false면 실제 gRPC 서버 호출
@@ -51,14 +53,22 @@ func Load() *Config {
 		aiTimeout = 5 * time.Second
 	}
 
+	cbThreshold, _ := strconv.Atoi(getEnv("CIRCUIT_BREAKER_THRESHOLD", "5"))
+	cbCooldown, err := time.ParseDuration(getEnv("CIRCUIT_BREAKER_COOLDOWN", "30s"))
+	if err != nil {
+		cbCooldown = 30 * time.Second
+	}
+
 	return &Config{
-		TargetURL:      getEnv("TARGET_URL", "http://localhost:8080"),
-		RedisAddr:      getEnv("REDIS_ADDR", "localhost:6379"),
-		Port:           getEnv("PORT", "9000"),
-		BlockThreshold: blockThreshold,
-		BlacklistTTL:   time.Duration(blacklistTTL) * time.Second, // 변환
-		WhitelistIPs:   whitelist,
-		AITimeout:      aiTimeout,
+		TargetURL:               getEnv("TARGET_URL", "http://localhost:8080"),
+		RedisAddr:               getEnv("REDIS_ADDR", "localhost:6379"),
+		Port:                    getEnv("PORT", "9000"),
+		BlockThreshold:          blockThreshold,
+		BlacklistTTL:            time.Duration(blacklistTTL) * time.Second, // 변환
+		WhitelistIPs:            whitelist,
+		AITimeout:               aiTimeout,
+		CircuitBreakerThreshold: cbThreshold,
+		CircuitBreakerCooldown:  cbCooldown,
 
 		UseMockAI:  getEnvBool("USE_MOCK_AI", false),
 		AIGrpcAddr: getEnv("AI_GRPC_ADDR", "localhost:50051"),

@@ -25,10 +25,10 @@ func main() {
 
 	// ─── AI 클라이언트 선택: Mock vs 실제 gRPC ─────────────
 	aiClient := newAIClient(cfg)
+	aiClient = aigrpc.NewCircuitBreaker(aiClient, cfg.CircuitBreakerThreshold, cfg.CircuitBreakerCooldown)
 	if closer, ok := aiClient.(interface{ Close() error }); ok {
 		defer closer.Close()
 	}
-
 	log.Printf("설정: 임계값=%.1f, TTL=%v, AI타임아웃=%v", cfg.BlockThreshold, cfg.BlacklistTTL, cfg.AITimeout)
 	log.Printf("화이트리스트: %v", cfg.WhitelistIPs)
 	log.Printf("타깃(서비스앱): %s | AI모드: mock=%v grpc=%s", cfg.TargetURL, cfg.UseMockAI, cfg.AIGrpcAddr)

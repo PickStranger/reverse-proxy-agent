@@ -51,4 +51,20 @@ var (
 			Help: "Number of requests currently being processed",
 		},
 	)
+
+	// Circuit Breaker 상태 (0=닫힘/정상, 1=열림/AI 호출 생략 중)
+	CircuitBreakerOpen = promauto.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "rev_circuit_breaker_open",
+			Help: "1 if AI circuit breaker is open (fail-open mode), 0 otherwise",
+		},
+	)
+
+	// Fail-Open으로 처리된(=AI 호출 생략하고 기본 ALLOW 처리한) 요청 수
+	FailOpenTotal = promauto.NewCounter(
+		prometheus.CounterOpts{
+			Name: "rev_ai_failopen_total",
+			Help: "Total number of requests handled via fail-open (AI call skipped due to circuit breaker)",
+		},
+	)
 )
