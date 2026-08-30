@@ -110,13 +110,12 @@ func main() {
 			return
 		}
 
-		resp, err := aiClient.Analyze(ctx, &aigrpc.AnalyzeRequest{
-			SessionToken:    req.SessionToken,
-			UserID:          req.UserID,
-			IP:              fp.IP,
-			UserAgent:       fp.UserAgent,
-			FingerprintHash: fp.Hash,
-			Timestamp:       time.Now().Unix(),
+		resp, err := aiClient.Predict(ctx, &aigrpc.PredictInput{
+			UserID:         req.UserID,
+			IP:             fp.IP,
+			LoginTimestamp: time.Now().Format(time.RFC3339),
+			IsSuccess:      true,
+			StoreEvent:     true,
 		})
 		if err != nil {
 			log.Printf("AI 오류: %v", err)
@@ -126,7 +125,7 @@ func main() {
 
 		_ = rc.DeleteFingerprint(ctx, req.SessionToken)
 
-		if resp.Block {
+		if resp.IsAnomaly {
 			_ = rc.AddBlacklist(ctx, fp.Hash, cfg.BlacklistTTL)
 			log.Printf("차단됨(AI): score=%.2f user=%s", resp.RiskScore, req.UserID)
 		}
@@ -134,7 +133,7 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"risk_score": resp.RiskScore,
-			"block":      resp.Block,
+			"is_anomaly": resp.IsAnomaly,
 			"action":     actionFromScore(resp.RiskScore),
 		})
 	})

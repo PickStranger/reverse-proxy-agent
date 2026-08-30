@@ -1092,7 +1092,7 @@ const file_proto_rba_service_proto_rawDesc = "" +
 	"\fTriggerTrain\x12\x11.rba.TrainRequest\x1a\x12.rba.TrainResponse\x12C\n" +
 	"\x0eGetTrainStatus\x12\x17.rba.TrainStatusRequest\x1a\x18.rba.TrainStatusResponse\x127\n" +
 	"\bListJobs\x12\x14.rba.ListJobsRequest\x1a\x15.rba.ListJobsResponse\x126\n" +
-	"\vReloadModel\x12\x12.rba.ReloadRequest\x1a\x13.rba.ReloadResponseB9Z7github.com/PickStranger/reverse-proxy-agent/pkg/gen/rbab\x06proto3"
+	"\vReloadModel\x12\x12.rba.ReloadRequest\x1a\x13.rba.ReloadResponseB\x0fZ\r./pkg/gen/rbab\x06proto3"
 
 var (
 	file_proto_rba_service_proto_rawDescOnce sync.Once
