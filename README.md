@@ -8,6 +8,7 @@
 - 담당: 리버스 프록시 설계, gRPC 연동, 성능 검증 및 병목 분석, 최적화
 
 ## 아키텍처
+```text
 Client ──▶ rev (Go Reverse Proxy :9000)
 ├── / 핑거프린트 저장 후 Original Service로 통과
 ├── /internal/analyze Redis 조회 → AI 위험도 판정 (gRPC)
@@ -15,6 +16,7 @@ Client ──▶ rev (Go Reverse Proxy :9000)
 └── Circuit Breaker ──▶ ai-lb (Nginx, round-robin)
 ├── rba #1 (XGBoost, gRPC :50051)
 └── rba #2 (XGBoost, gRPC :50051)
+```
 
 Prometheus (scrape 5s) ──▶ Grafana (:3000)
 
