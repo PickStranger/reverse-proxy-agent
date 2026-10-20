@@ -93,8 +93,7 @@ docker compose up -d
 | `AI_GRPC_ADDR` | AI 서버(또는 ai-lb) gRPC 주소 [ ] |
 
 ## 디렉토리 구조
-디렉터리 트리
-text
+```text,
 reverse-proxy-agent/
 ├── cmd/
 │   └── main.go                  # 진입점: 설정 로드, 핸들러 등록, 서버 시작
@@ -135,8 +134,10 @@ reverse-proxy-agent/
 ├── .env                         # 로컬 설정 (커밋 안 함)
 ├── go.mod / go.sum
 └── README.md
-요청 흐름
-text
+```
+
+##요청 흐름
+```text
 클라이언트 ──► rev :9000
                 │
                 ├─ /                 모든 경로(백엔드로 프록시)
@@ -153,8 +154,7 @@ text
                 │    4. {risk_score, is_anomaly, action(ALLOW/CHALLENGE/BLOCK)} 응답
                 │
                 └─ /metrics           Prometheus 지표
-
-
+```
 
 ## 팀
 
