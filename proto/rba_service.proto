@@ -1,0 +1,123 @@
+syntax = "proto3";
+
+package rba;
+option go_package = "./pkg/gen/rba";
+
+// ────────────────────────── Health ──────────────────────────
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status         = 1;
+  string active_model   = 2;
+  bool   model_loaded   = 3;
+  int32  labeled_events = 4;
+}
+
+// ────────────────────────── Predict ─────────────────────────
+
+message PredictRequest {
+  string user_id          = 1;
+  string ip               = 2;
+  string country          = 3;
+  string region           = 4;
+  string city             = 5;
+  int32  asn              = 6;
+  string os_name          = 7;
+  string os_version       = 8;
+  string browser_name     = 9;
+  string browser_version  = 10;
+  string device_type      = 11;
+  string timezone         = 12;
+  int32  timezone_offset  = 13;
+  string webgl_renderer   = 14;
+  string webgl_vendor     = 15;
+  string login_timestamp  = 16;
+  bool   is_success       = 17;
+  bool   store_event      = 18;
+}
+
+message PredictResponse {
+  bool  is_anomaly  = 1;
+  float risk_score  = 2;
+  int32 event_id    = 3;  // 0 = 저장하지 않음
+}
+
+// ────────────────────────── Label ───────────────────────────
+
+message LabelRequest {
+  int32 event_id            = 1;
+  bool  is_attack           = 2;
+  bool  is_account_takeover = 3;
+}
+
+message LabelResponse {
+  int32 event_id = 1;
+  bool  labeled  = 2;
+}
+
+// ────────────────────────── Train ───────────────────────────
+
+message TrainRequest {
+  string start_date      = 1;  // ISO 8601 (선택)
+  string end_date        = 2;  // ISO 8601 (선택)
+  int32  recent_days     = 3;  // 0 = 미지정
+  int32  fine_tune_trees = 4;  // 0 = 기본값(50) 사용
+}
+
+message TrainResponse {
+  string job_id  = 1;
+  string status  = 2;
+  string message = 3;
+}
+
+message TrainStatusRequest {
+  string job_id = 1;
+}
+
+message TrainStatusResponse {
+  string job_id          = 1;
+  string status          = 2;
+  string started_at      = 3;
+  string finished_at     = 4;
+  string error           = 5;
+  int32  samples         = 6;
+  int32  added_trees     = 7;
+  string new_model_path  = 8;
+}
+
+message ListJobsRequest {}
+
+message JobSummary {
+  string job_id      = 1;
+  string status      = 2;
+  string started_at  = 3;
+  string finished_at = 4;
+}
+
+message ListJobsResponse {
+  repeated JobSummary jobs = 1;
+}
+
+// ────────────────────────── Model Reload ────────────────────
+
+message ReloadRequest {
+  string model_path = 1;
+}
+
+message ReloadResponse {
+  string status       = 1;
+  string active_model = 2;
+}
+
+// ────────────────────────── Service ─────────────────────────
+
+service RBAService {
+  rpc Health          (HealthRequest)      returns (HealthResponse);
+  rpc Predict         (PredictRequest)     returns (PredictResponse);
+  rpc LabelEvent      (LabelRequest)       returns (LabelResponse);
+  rpc TriggerTrain    (TrainRequest)       returns (TrainResponse);
+  rpc GetTrainStatus  (TrainStatusRequest) returns (TrainStatusResponse);
+  rpc ListJobs        (ListJobsRequest)    returns (ListJobsResponse);
+  rpc ReloadModel     (ReloadRequest)      returns (ReloadResponse);
+}

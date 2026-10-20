@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package anomaly.v1;                        // environment.proto랑 패키지 분리
+option go_package = "./pkg/gen/anomaly";   // 생성 경로도 분리
+option java_package = "com.example.pickstranger.anomaly";
+option java_multiple_files = true;
+
+service AnomalyAnalyzeService{
+  rpc Analyze (AnalyzeRequest) returns (AnalyzeResponse);
+}
+
+message AnalyzeRequest {
+  string session_token    = 1;
+  string user_id          = 2;  // SDK에서 전달받은 값
+  string ip               = 3;
+  string user_agent       = 4;
+  string fingerprint_hash = 5;
+  int64  timestamp        = 6;
+  string country          = 7;  // IP 기반 국가
+}
+
+message AnalyzeResponse {
+  float  risk_score = 1;  // 0.0 ~ 1.0
+  bool   block      = 2;
+  string reason     = 3;  // FINGERPRINT_MISMATCH 등
+}
