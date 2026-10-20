@@ -93,6 +93,8 @@ docker compose up -d
 | `AI_GRPC_ADDR` | AI 서버(또는 ai-lb) gRPC 주소 [ ] |
 
 ## 디렉토리 구조
+디렉터리 트리
+text
 reverse-proxy-agent/
 ├── cmd/
 │   └── main.go                  # 진입점: 설정 로드, 핸들러 등록, 서버 시작
@@ -133,6 +135,26 @@ reverse-proxy-agent/
 ├── .env                         # 로컬 설정 (커밋 안 함)
 ├── go.mod / go.sum
 └── README.md
+요청 흐름
+text
+클라이언트 ──► rev :9000
+                │
+                ├─ /                 모든 경로(백엔드로 프록시)
+                │    1. 핑거프린트 추출 (IP + User-Agent + Accept-Language → SHA-256)
+                │    2. 세션 토큰 발급, Redis에 60초 저장  (fp:<token>)
+                │    3. 화이트리스트 IP면 통과
+                │    4. 블랙리스트(blacklist:<hash>)면 403
+                │    5. X-Session-Token 헤더를 붙여 백엔드로 전달
+                │
+                ├─ /internal/analyze  SDK가 로그인 직후 호출 (POST)
+                │    1. 세션 토큰으로 Redis에서 핑거프린트 조회
+                │    2. Circuit Breaker → AI gRPC Predict
+                │    3. 토큰 삭제, 이상(is_anomaly)이면 핑거프린트 해시를 블랙리스트에 등록
+                │    4. {risk_score, is_anomaly, action(ALLOW/CHALLENGE/BLOCK)} 응답
+                │
+                └─ /metrics           Prometheus 지표
+
+
 
 ## 팀
 
